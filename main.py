@@ -1,14 +1,14 @@
-
 from agents import sql_maker
 import parser
-import coder
+from file_manager.file_manager import FileManager
 
 project_path = "example"
 config_file = "./example.yml"
 
-coder.delete_project(project_path)
+file_manager = FileManager(project_path)
+file_manager.deleteProject()
 data = parser.parse_yaml_config(config_file)
-coder.create_golang_project_template(project_path)
+file_manager.createGolangProjectTemplate()
 
 # sqlc
 sql_maker.query_sql_generator.query_sql_generator(project_path, data['handlers'])
