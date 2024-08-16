@@ -32,8 +32,15 @@ class HandlerMaker:
     # TODO: check if sql has returns
     def genrateHandler(self):
         handler_template = """
+import (
+    "net/http"
+    // TODO: replace hardcoded models import
+    "example.com/crud/models"
+	"github.com/labstack/echo/v4"
+)
+
 func $name(c echo.Context) error {
-	request := new(models.$request_params})
+	request := new(models.$request_params)
 	if err := c.Bind(request); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}

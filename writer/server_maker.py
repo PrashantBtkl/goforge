@@ -1,4 +1,5 @@
 import os
+import subprocess
 from jinja2 import Environment, FileSystemLoader
 
 class ServerMaker:
@@ -7,6 +8,7 @@ class ServerMaker:
         self.handlers = handlers
         self._generate_routes()
         self.createMainServer()
+        self.initializeProject()
 
     def _generate_routes(self):
         self.routes = []
@@ -46,4 +48,27 @@ func main() {
                 f.write(rendered_template)
         except Exception as e:
             print(f"An error occurred while writing to main: {e}")
+
+    # assumes current directory is in project
+    def initializeProject(self):
+        # TODO: make project name customizable
+        result = subprocess.run(['go', 'mod', 'init', 'example.com/crud'], capture_output=True, text=True)
+        if result.returncode != 0:
+            print("Error:", result.stderr)
+        result = subprocess.run(['go', 'mod', 'tidy'], capture_output=True, text=True)
+        print(result)
+        if result.returncode != 0:
+            print("Error:", result.stderr)
+
+        result = subprocess.run(['gofmt', '.'], capture_output=True, text=True)
+        if result.returncode != 0:
+            print("Error:", result.stderr)
+
+        result = subprocess.run(['goimports', '-w', '.'], capture_output=True, text=True)
+        if result.returncode != 0:
+            print("Error:", result.stderr)
+
+
+
+
 
