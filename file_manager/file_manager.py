@@ -14,18 +14,11 @@ class FileManager:
     def createGolangProjectTemplate(self):
         os.mkdir(self.project_path)
     
-        api_dir = os.path.join(self.project_path, 'api')
-        os.mkdir(api_dir)
-    
-        handlers_dir = os.path.join(api_dir, 'handlers')
+        handlers_dir = os.path.join(self.project_path, 'handlers')
         os.mkdir(handlers_dir)
     
         models_dir = os.path.join(self.project_path, 'models')
         os.mkdir(models_dir)
-    
-        routes_file = os.path.join(api_dir, 'routes.go')
-        with open(routes_file, 'w') as f:
-            f.write('package api\n')
     
         main_file = os.path.join(self.project_path, 'main.go')
         with open(main_file, 'w') as f:

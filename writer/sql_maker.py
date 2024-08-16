@@ -5,7 +5,6 @@ import subprocess
 def query_sql_generator(project_path, handlers):
     querysql = ""
     for handler in handlers:
-        print(handler)
         sql = handler['sql']
         sqlstr = f"-- name: {sql['name']} :{sql['annotation']}\n{sql['query']};\n\n"
         querysql += sqlstr
@@ -20,8 +19,8 @@ def query_sql_generator(project_path, handlers):
 
     except yaml.YAMLError as e:
         print(f"Error parsing YAML file: {e}")
-    except FileNotFoundError:
-        print(f"File not found: {f}")
+    except FileNotFoundError as e:
+        print(f"File not found: {e}")
     except Exception as e:
         print(f"An error occurred: {e}")
 
@@ -36,7 +35,7 @@ def schema_file(project_path, source_path):
             f = open(os.path.join(project_path, data['sql'][0]['schema']), 'w')
             f.write(contents)
 
-        print(f"Contents copied from {source_path} to {f}")
+        print(f"Contents copied from {source_path} to {sqlcfile}")
 
     except IOError as e:
         print(f"An error occurred: {e}")

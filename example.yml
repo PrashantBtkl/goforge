@@ -28,7 +28,7 @@ handlers:
       type: json
       data: {"success": true}
   - name: GetUsers
-    path: "/v1/api/users/{id}"
+    path: "/v1/api/users/:id"
     sql:
       name: GetUsers
       annotation: many

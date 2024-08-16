@@ -1,4 +1,4 @@
-from agents import sql_maker
+from writer import sql_maker, handler_maker, server_maker
 import parser
 from file_manager.file_manager import FileManager
 
@@ -11,9 +11,15 @@ data = parser.parse_yaml_config(config_file)
 file_manager.createGolangProjectTemplate()
 
 # sqlc
-sql_maker.query_sql_generator.query_sql_generator(project_path, data['handlers'])
-sql_maker.query_sql_generator.schema_file(project_path, data['schema_file'])
-sql_maker.query_sql_generator.sqlc_generate(project_path)
+sql_maker.query_sql_generator(project_path, data['handlers'])
+sql_maker.schema_file(project_path, data['schema_file'])
+sql_maker.sqlc_generate(project_path)
+
+# handler
+handler_maker.generateHandlers(project_path, data['handlers'])
+
+# server
+server_maker.ServerMaker(project_path, data['handlers'])
 
 print("done")
 
