@@ -9,11 +9,6 @@ handlers:
       query: "update users set name = $1 where id = $2"
     request:
       method: "PATCH"
-      type: "json"
-      data: {"user": 1, "name": "foobar"}
-    response:
-      type: json
-      data: {"success": true}
   - name: CreateUser
     path: "/v1/api/user"
     sql:
@@ -22,19 +17,11 @@ handlers:
        query: "insert into users (name, email) values ($1, $2)"
     request:
        method: "POST"
-       type: "json"
-       data: {"email": "mail.com", "name": "foobar"}
-    response:
-      type: json
-      data: {"success": true}
   - name: GetUsers
-    path: "/v1/api/users/:id"
+    path: "/v1/api/users"
     sql:
       name: GetUsers
       annotation: many
       query: "select id, name, email from users"
     request:
       method: "GET"
-    response:
-      type: "json"
-      data: {"user": 1, "name": "foobar", "email": "1@mail.com"}
