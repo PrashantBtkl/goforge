@@ -1,5 +1,5 @@
 import os
-from string import Template
+from jinja2 import Environment, FileSystemLoader
 
 class HandlerMaker:
     def __init__(self, project_path, handler):
@@ -8,15 +8,27 @@ class HandlerMaker:
         self.name = handler['name']
         self.path = handler['path']
         self.method = handler['request']['method']
-        self.request_params = self._requestParams(self.model_name)
-        self.file_path = self._createHandlerFile(self.name)
+        self.request_params = self._requestParams()
+        self.file_path = self._createHandlerFile()
+        self.has_params = self._hasParams(handler['sql']['query'])
+        self.sql_returns = self._sqlReturns(handler['sql']['annotation'])
         self._createConfig()
 
-    def _requestParams(self, model_name):
-        return model_name[0].upper() + model_name[1:] + "Params"
+    def _hasParams(self, sql):
+        for ch in sql:
+            if ch == '$':
+                return True
+        return False
+    def _sqlReturns(self, annotation):
+        if annotation == 'exec':
+            return False
+        return True
 
-    def _createHandlerFile(self, name):
-        file_name =  ''.join(['_' + ch.lower() if i > 0 and ch.isupper() else ch.lower() for i, ch in enumerate(name)])
+    def _requestParams(self):
+        return self.model_name[0].upper() + self.model_name[1:] + "Params"
+
+    def _createHandlerFile(self):
+        file_name =  ''.join(['_' + ch.lower() if i > 0 and ch.isupper() else ch.lower() for i, ch in enumerate(self.name)])
         # we already change our working directory while we generate sqlc.yml file
         # TODO: generalize current folder location
         file_path = os.path.join('handlers', f"{file_name}.go")
@@ -60,22 +72,56 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func $name(c echo.Context) error {
-	var request models.$request_params
+func {{name}}(c echo.Context) error {
+    {% if has_params %}
+	var request models.{{request_params}}
 	if err := c.Bind(&request); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
-    response, err := Client.$model_name(c.Request().Context(), request)
+    {% endif %}
+
+    {% if has_params and sql_returns %}
+    response, err := Client.{{model_name}}(c.Request().Context(), request)
     if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
     }
+
 	return c.JSON(http.StatusOK, response)
+    {% endif %}
+
+    {% if not has_params and sql_returns %}
+    response, err := Client.{{model_name}}(c.Request().Context())
+    if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+    }
+
+	return c.JSON(http.StatusOK, response)
+    {% endif %}
+
+    {% if has_params and not sql_returns %}
+    err := Client.{{model_name}}(c.Request().Context(), request)
+    if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+    }
+
+	return c.JSON(http.StatusOK, nil)
+    {% endif %}
+
+    {% if not has_params and not sql_returns %}
+    err := Client.{{model_name}}(c.Request().Context())
+    if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+    }
+
+	return c.JSON(http.StatusOK, nil)
+    {% endif %}
 }"""
-        template = Template(handler_template)
-        result = template.substitute(name=self.name, request_params= self.request_params, model_name=self.model_name)
+        env = Environment(loader=FileSystemLoader(""))
+        template = env.from_string(handler_template)
+        rendered_template = template.render(name=self.name,  request_params=self.request_params, model_name=self.model_name, has_params=self.has_params, sql_returns=self.sql_returns)
         try:
             with open(self.file_path, 'a') as f:
-                f.write(result)
+                f.write(rendered_template)
         except Exception as e:
             print(f"An error occurred: {e}")
 

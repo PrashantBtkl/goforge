@@ -53,11 +53,12 @@ func main() {
     # assumes current directory is in project
     def initializeProject(self):
         # TODO: make project name customizable
-        result = subprocess.run(['go', 'mod', 'init', 'example.com/crud'], capture_output=True, text=True)
+        project_mod = 'example.com/crud'
+        result = subprocess.run(['go', 'mod', 'init', project_mod], capture_output=True, text=True)
+        print("initiated golang project:", project_mod)
         if result.returncode != 0:
             print("Error:", result.stderr)
         result = subprocess.run(['go', 'mod', 'tidy'], capture_output=True, text=True)
-        print(result)
         if result.returncode != 0:
             print("Error:", result.stderr)
 
