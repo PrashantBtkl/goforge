@@ -10,6 +10,7 @@ class HandlerMaker:
         self.method = handler['request']['method']
         self.request_params = self._requestParams(self.model_name)
         self.file_path = self._createHandlerFile(self.name)
+        self._createConfig()
 
     def _requestParams(self, model_name):
         return model_name[0].upper() + model_name[1:] + "Params"
@@ -27,6 +28,26 @@ class HandlerMaker:
 
         return file_path
 
+    # TODO: refactor db initialization
+    def _createConfig(self):
+        file_path = os.path.join('handlers', "config.go")
+        try:
+            with open(file_path, 'w') as f:
+                f.write("""
+package handlers
+
+import (
+	"database/sql"
+
+	"example.com/crud/models"
+)
+
+var Db *sql.DB
+var Client *models.Queries""")
+        except Exception as e:
+            print(f"An error occurred: {e}")
+
+
 
     # TODO: create different templates for GET, POST, DELETE, ... methods
     # TODO: check if sql has returns
@@ -40,13 +61,13 @@ import (
 )
 
 func $name(c echo.Context) error {
-	request := new(models.$request_params)
-	if err := c.Bind(request); err != nil {
+	var request models.$request_params
+	if err := c.Bind(&request); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
-    response, err := models.$model_name(c.Request().Context(), request)
+    response, err := Client.$model_name(c.Request().Context(), request)
     if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServer, err.Error())
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
     }
 	return c.JSON(http.StatusOK, response)
 }"""

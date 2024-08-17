@@ -29,6 +29,7 @@ import (
 
 func main() {
 	e := echo.New()
+	handlers.Client = models.New(handlers.Db)
 
     {% for route in routes %}
     e.{{route.method}}("{{route.path}}", handlers.{{route.handler}})
