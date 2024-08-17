@@ -8,13 +8,13 @@ import (
 )
 
 func UpdateUser(c echo.Context) error {
-	request := new(models.UpdateUserNameParams)
-	if err := c.Bind(request); err != nil {
+	var request models.UpdateUserNameParams
+	if err := c.Bind(&request); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
-	response, err := models.UpdateUserName(c.Request().Context(), request)
+	err := Client.UpdateUserName(c.Request().Context(), request)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServer, err.Error())
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
-	return c.JSON(http.StatusOK, response)
+	return c.JSON(http.StatusOK, nil)
 }
