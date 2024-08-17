@@ -88,7 +88,6 @@ func {{name}}(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, response)
     {% endif %}
-
     {% if not has_params and sql_returns %}
     response, err := Client.{{model_name}}(c.Request().Context())
     if err != nil {
@@ -97,7 +96,6 @@ func {{name}}(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, response)
     {% endif %}
-
     {% if has_params and not sql_returns %}
     err := Client.{{model_name}}(c.Request().Context(), request)
     if err != nil {
@@ -106,7 +104,6 @@ func {{name}}(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, nil)
     {% endif %}
-
     {% if not has_params and not sql_returns %}
     err := Client.{{model_name}}(c.Request().Context())
     if err != nil {
