@@ -8,8 +8,9 @@ project_mod = "example.com/crud"
 
 file_manager = FileManager(project_path)
 file_manager.deleteProject()
-data = parser.parse_yaml_config(config_file)
 file_manager.createGolangProjectTemplate()
+
+data = parser.parseConfig(config_file)
 
 # creates sqlc generated models and query files
 # setups docker compose postgres db for local testing

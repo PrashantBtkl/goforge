@@ -1,6 +1,6 @@
 import yaml
 
-def parse_yaml_config(file_path):
+def parseConfig(file_path):
     try:
         with open(file_path, 'r') as file:
             data = yaml.safe_load(file)
