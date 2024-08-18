@@ -2,7 +2,7 @@ package handlers
 
 import (
 	"net/http"
-	// TODO: replace hardcoded models import
+
 	"example.com/crud/models"
 	"github.com/labstack/echo/v4"
 )
