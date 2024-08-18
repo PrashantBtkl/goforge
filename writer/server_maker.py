@@ -3,18 +3,21 @@ import subprocess
 from jinja2 import Environment, FileSystemLoader
 
 class ServerMaker:
-    def __init__(self, project_path, handlers):
+    def __init__(self, project_path, project_mod, handlers):
         self.project_path = project_path
+        self.project_mod = project_mod
         self.handlers = handlers
+        self.routes = []
         self._generate_routes()
-        self.createMainServer()
-        self.initializeProject()
 
     def _generate_routes(self):
-        self.routes = []
         for handler in self.handlers:
             route = dict(path=handler['path'], method= handler['request']['method'], handler= handler['name'])
             self.routes.append(route)
+
+    def Make(self):
+        self.createMainServer()
+        self.initializeProject()
 
     def createMainServer(self):
         template_str = """
@@ -61,9 +64,8 @@ func main() {
     # assumes current directory is in project
     def initializeProject(self):
         # TODO: make project name customizable
-        project_mod = 'example.com/crud'
-        result = subprocess.run(['go', 'mod', 'init', project_mod], capture_output=True, text=True)
-        print("initiated golang project:", project_mod)
+        result = subprocess.run(['go', 'mod', 'init', self.project_mod], capture_output=True, text=True)
+        print("initiated golang project:", self.project_mod)
         if result.returncode != 0:
             print("Error:", result.stderr)
         result = subprocess.run(['go', 'mod', 'tidy'], capture_output=True, text=True)
@@ -76,6 +78,7 @@ func main() {
         if result.returncode != 0:
             print("Error:", result.stderr)
         result = subprocess.run(['docker', 'compose', 'up', '-d'], capture_output=True, text=True)
+        print(result.stdout, result.stderr)
         if result.returncode != 0:
             print("Error:", result.stderr)
 

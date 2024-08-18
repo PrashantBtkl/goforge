@@ -4,6 +4,7 @@ class FileManager:
     def __init__(self, project_path):
         self.project_path = project_path
 
+    #TODO: By default project shouldnt be deleted
     def deleteProject(self):
         try:
             shutil.rmtree(self.project_path)
@@ -44,8 +45,7 @@ sql:
         emit_pointers_for_null_types: true
         emit_prepared_queries: true
         omit_unused_structs: true
-        output_db_file_name: "db.gen"
-        output_models_file_name: "models.gen"
-        output_files_suffix: ".gen"
+        output_db_file_name: "db"
+        output_models_file_name: "models"
                     """)
 

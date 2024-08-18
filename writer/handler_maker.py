@@ -19,6 +19,7 @@ class HandlerMaker:
             if ch == '$':
                 return True
         return False
+
     def _sqlReturns(self, annotation):
         if annotation == 'exec':
             return False
@@ -50,8 +51,6 @@ package handlers
 
 import (
 	"database/sql"
-
-	"example.com/crud/models"
 )
 
 var Db *sql.DB
@@ -59,16 +58,10 @@ var Client *models.Queries""")
         except Exception as e:
             print(f"An error occurred: {e}")
 
-
-
-    # TODO: create different templates for GET, POST, DELETE, ... methods
-    # TODO: check if sql has returns
     def genrateHandler(self):
         handler_template = """
 import (
     "net/http"
-    // TODO: replace hardcoded models import
-    "example.com/crud/models"
 	"github.com/labstack/echo/v4"
 )
 
