@@ -10,6 +10,20 @@
 ## Description
  This tool is designed to be used as a starting a project and editing the files later. It uses sqlc to generate all the sql related code. Make sure sqlc, goimports, gofmt, docker are installed
 
+ ## Installation
+ ```bash
+pip install goforge
+```
+## Quick start
+```bash
+$ goforge --config-file example.yml
+
+Folder 'example' deleted successfully.
+initiated golang project: example.com/crud
+Container example-postgres-1  Created
+done
+```
+
 ## API Configuration Documentation
 
 edit the yaml as per your requirements
