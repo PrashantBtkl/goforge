@@ -1,6 +1,6 @@
 [project]
 name = "goforge"
-version = "0.0.3"
+version = "0.0.5"
 authors = [
   { name="Prashant Bhatkal", email="prashantbhatkal2000@gmail.com" },
 ]
@@ -20,23 +20,26 @@ Issues = "https://github.com/PrashantBtkl/goforge/issues"
 dependencies = { file = ["requirements.txt"] }
 
 [build-system]
-requires = ["setuptools>=61.0"]
-build-backend = "setuptools.build_meta"
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "goforge"
-version = "0.0.3"
+version = "0.0.5"
 description = "generate entire CRUD backend for golang echo and postgres with one command"
 authors = ["Prashant Bhatkal <prashantbhatkal2000@gmail.com>"]
+readme = "README.md"
+keywords = [
+    "code generation",
+	"golang echo",
+	"nocode"
+]
+packages = [{ include = "goforge", from = "." }]
 
 [tool.poetry.dependencies]
 python = "^3.7"
-# Add your package dependencies here
-
-[tool.poetry.dev-dependencies]
-pytest = "^6.0"
-# Add your development dependencies here
+Jinja2 = ">=3.1.2"
 
 [tool.poetry.scripts]
-my-command = "my_package.cli:main"
+goforge = "goforge.__main__:entrypoint"
 

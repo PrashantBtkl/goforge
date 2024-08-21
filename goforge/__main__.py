@@ -1,6 +1,6 @@
-from writer import sql_maker, handler_maker, server_maker
-import config_parser
-from file_manager.file_manager import FileManager
+from goforge.config_parser import parseConfig
+from goforge.writer import sql_maker, handler_maker, server_maker
+from goforge.file_manager.file_manager import FileManager
 import argparse
 
 def entrypoint():
@@ -10,7 +10,7 @@ def entrypoint():
     args = parser.parse_args()
     config_file = args.config_file
     
-    data = config_parser.parseConfig(config_file)
+    data = parseConfig(config_file)
     
     file_manager = FileManager(data['project_path'])
     file_manager.deleteProject()
