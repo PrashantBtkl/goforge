@@ -3,12 +3,12 @@
 <h1 align="center">GoForge</h1>
 
 <p align="center">
-    generate entire CRUD backend for golang echo and postgres with one command
+    generate the entire CRUD backend for golang echo and postgres with one command
     <br />
     <br />
     
 ## Description
- This tool is designed to be used as a starting a project and editing the files later. It uses sqlc to generate all the sql related code. Make sure sqlc, goimports, gofmt, docker are installed
+ This tool is designed to be used for starting a project and editing the files later. It uses sqlc to generate all the sql related code. Make sure sqlc, goimports, gofmt, and docker are installed.
 
  ## Installation
  ```bash
