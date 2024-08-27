@@ -9,11 +9,12 @@
 [![PyPi package version](https://img.shields.io/pypi/v/goforge)](https://pypi.org/project/goforge/)	 
 [![PyPi downloads](https://static.pepy.tech/badge/goforge)](https://pypi.org/project/goforge/)
 [![PyPI version](https://img.shields.io/pypi/pyversions/goforge?color=%2344CC11&style=flat-square)](https://pypi.org/project/goforge/)
- </div>
+
 <br>
     generate the entire CRUD backend for golang echo and postgres with one command
-    <br />
-    <br />
+ </div>
+    <br>
+    <br>
     
 ## Description
  This tool is designed to be used for starting a project and editing the files later. It uses sqlc to generate all the sql related code. Make sure sqlc, goimports, gofmt, and docker are installed.
