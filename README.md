@@ -3,6 +3,14 @@
 <h1 align="center">GoForge</h1>
 
 <p align="center">
+
+ <div align="center">
+	 
+[![PyPi package version](https://img.shields.io/pypi/v/goforge)](https://pypi.org/project/goforge/)	 
+[![PyPi downloads](https://static.pepy.tech/badge/goforge)](https://pypi.org/project/goforge/)
+[![PyPI version](https://img.shields.io/pypi/pyversions/goforge?color=%2344CC11&style=flat-square)](https://pypi.org/project/goforge/)
+ </div>
+<br>
     generate the entire CRUD backend for golang echo and postgres with one command
     <br />
     <br />
