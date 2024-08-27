@@ -30,6 +30,7 @@ edit the yaml as per your requirements
 ```yaml
 project_path: "example"
 schema_file: "example.sql"
+project_mod: "example.com/crud"
 handlers:
   - name: CreateUser
     path: "/v1/api/user"
