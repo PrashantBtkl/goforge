@@ -53,8 +53,16 @@ import (
 	"database/sql"
 )
 
-var Db *sql.DB
-var Client *models.Queries""")
+type Server struct {
+	Queries *models.Queries
+}
+
+func New(db *sql.DB) *Server {
+	return &Server{
+		Queries: models.New(db),
+	}
+
+}""")
         except Exception as e:
             print(f"An error occurred: {e}")
 
@@ -65,7 +73,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func {{name}}(c echo.Context) error {
+func (s *Server) {{name}}(c echo.Context) error {
     {% if has_params %}
 	var request models.{{request_params}}
 	if err := c.Bind(&request); err != nil {
@@ -74,7 +82,7 @@ func {{name}}(c echo.Context) error {
     {% endif %}
 
     {% if has_params and sql_returns %}
-    response, err := Client.{{model_name}}(c.Request().Context(), request)
+    response, err := s.Queries.{{model_name}}(c.Request().Context(), request)
     if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
     }
@@ -82,7 +90,7 @@ func {{name}}(c echo.Context) error {
 	return c.JSON(http.StatusOK, response)
     {% endif %}
     {% if not has_params and sql_returns %}
-    response, err := Client.{{model_name}}(c.Request().Context())
+    response, err := s.Queries.{{model_name}}(c.Request().Context())
     if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
     }
@@ -90,7 +98,7 @@ func {{name}}(c echo.Context) error {
 	return c.JSON(http.StatusOK, response)
     {% endif %}
     {% if has_params and not sql_returns %}
-    err := Client.{{model_name}}(c.Request().Context(), request)
+    err := s.Queries.{{model_name}}(c.Request().Context(), request)
     if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
     }
@@ -98,7 +106,7 @@ func {{name}}(c echo.Context) error {
 	return c.JSON(http.StatusOK, nil)
     {% endif %}
     {% if not has_params and not sql_returns %}
-    err := Client.{{model_name}}(c.Request().Context())
+    err := s.Queries.{{model_name}}(c.Request().Context())
     if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
     }
@@ -115,7 +123,7 @@ func {{name}}(c echo.Context) error {
         except Exception as e:
             print(f"An error occurred: {e}")
 
-def generateHandlers(project_path, handlers):
+def GenerateHandlers(project_path, handlers):
     for handler in handlers:
         HandlerMaker(project_path, handler).genrateHandler()
 

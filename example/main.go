@@ -5,28 +5,27 @@ import (
 	"log"
 
 	"example.com/crud/handlers"
-	"example.com/crud/models"
 	"github.com/labstack/echo/v4"
 	_ "github.com/lib/pq"
 )
 
 func main() {
 	e := echo.New()
-	// TODO: refactor db initilization
+	// TODO: should be configurable from config yaml
 	connStr := "host=localhost port=5432 user=postgres dbname=postgres password=postgres sslmode=disable"
 	var err error
-	handlers.Db, err = sql.Open("postgres", connStr)
+	Db, err := sql.Open("postgres", connStr)
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer handlers.Db.Close()
-	handlers.Client = models.New(handlers.Db)
+	defer Db.Close()
+	s := handlers.New(Db)
 
-	e.PATCH("/v1/api/user", handlers.UpdateUser)
+	e.PATCH("/v1/api/user", s.UpdateUser)
 
-	e.POST("/v1/api/user", handlers.CreateUser)
+	e.POST("/v1/api/user", s.CreateUser)
 
-	e.GET("/v1/api/users", handlers.GetUsers)
+	e.GET("/v1/api/users", s.GetUsers)
 
 	e.Logger.Fatal(e.Start(":8080"))
 }
