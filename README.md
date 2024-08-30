@@ -28,7 +28,7 @@ pip install goforge
 $ goforge --config-file example.yml
 
 Folder 'example' deleted successfully.
-initiated golang project: example.com/crud
+initiated golang project: example.com/my_crud_app
 Container example-postgres-1  Created
 done
 ```
@@ -37,16 +37,16 @@ done
 
 edit the yaml as per your requirements
 ```yaml
-project_path: "example"
-schema_file: "example.sql"
-project_mod: "example.com/crud"
+project_path: "example" # specifies the root directory for the project
+schema_file: "example.sql" # defines the sql schema file for the project
+project_mod: "example.com/my_crud_app" # go.mod project name
 handlers:
-  - name: CreateUser
-    path: "/v1/api/user"
+  - name: CreateUser # handler function name
+    path: "/v1/api/user" # api path
     sql:
-       name: CreateUser
-       annotation: exec
-       query: "insert into users (name, email) values ($1, $2)"
+       name: CreateUser # sqlc model method name
+       annotation: exec # annotations compatible with sqlc, for eg: "one", "many" and "exec"
+       query: "INSERT INTO users (name, email) VALUES ($1, $2)"
     request:
        method: "POST"
   - name: GetUsers
@@ -54,20 +54,7 @@ handlers:
     sql:
       name: GetUsers
       annotation: many
-      query: "select id, name, email from users"
+      query: "SELECT id, name, email FROM users"
     request:
       method: "GET"
 ```
-
-This document describes the configuration for an API project using a YAML file.
-
--   `project_path`: Specifies the root directory for the project.
--   `schema_file`:  Defines the SQL schema file for the project.
--  `handlers`: The configuration defines API handlers
-	-  `name` : name of handler in PascalCase
-	- `path` : api path
-	- `sql` : configuration for sql queries
-		-  `name` : name of sql query function
-		- `annotation` : ranges from "one", "many" and "exec"
-		- `query` : sql query with variable params syntax of psql
-	- `request.method` : defines the http verb of the api path

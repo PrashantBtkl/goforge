@@ -6,9 +6,9 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func GetUsers(c echo.Context) error {
+func (s *Server) GetUsers(c echo.Context) error {
 
-	response, err := Client.GetUsers(c.Request().Context())
+	response, err := s.Queries.GetUsers(c.Request().Context())
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}

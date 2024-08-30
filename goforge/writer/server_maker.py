@@ -32,18 +32,18 @@ import (
 
 func main() {
 	e := echo.New()
-    // TODO: refactor db initilization
-    connStr := "host=localhost port=5432 user=postgres dbname=postgres password=postgres sslmode=disable"
-    var err error
-    handlers.Db, err = sql.Open("postgres", connStr)
+	// TODO: should be configurable from config yaml
+	connStr := "host=localhost port=5432 user=postgres dbname=postgres password=postgres sslmode=disable"
+	var err error
+	Db, err := sql.Open("postgres", connStr)
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer handlers.Db.Close()
-	handlers.Client = models.New(handlers.Db)
+	defer Db.Close()
+	s := handlers.New(Db)
 
     {% for route in routes %}
-    e.{{route.method}}("{{route.path}}", handlers.{{route.handler}})
+    e.{{route.method}}("{{route.path}}", s.{{route.handler}})
     {% endfor %}
     
 	e.Logger.Fatal(e.Start(":8080"))
@@ -63,7 +63,6 @@ func main() {
 
     # assumes current directory is in project
     def initializeProject(self):
-        # TODO: make project name customizable
         result = subprocess.run(['go', 'mod', 'init', self.project_mod], capture_output=True, text=True)
         print("initiated golang project:", self.project_mod)
         if result.returncode != 0:
@@ -71,10 +70,8 @@ func main() {
         result = subprocess.run(['go', 'mod', 'tidy'], capture_output=True, text=True)
         if result.returncode != 0:
             print("Error:", result.stderr)
-        result = subprocess.run(['gofmt', '.'], capture_output=True, text=True)
-        if result.returncode != 0:
-            print("Error:", result.stderr)
-        result = subprocess.run(['goimports', '-w', '.'], capture_output=True, text=True)
+        result = subprocess.run(['goimports', '-w', '-v', '.'], capture_output=True, text=True)
+        result.stdout
         if result.returncode != 0:
             print("Error:", result.stderr)
         result = subprocess.run(['docker', 'compose', 'up', '-d'], capture_output=True, text=True)

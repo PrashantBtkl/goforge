@@ -6,5 +6,13 @@ import (
 	"example.com/crud/models"
 )
 
-var Db *sql.DB
-var Client *models.Queries
+type Server struct {
+	Queries *models.Queries
+}
+
+func New(db *sql.DB) *Server {
+	return &Server{
+		Queries: models.New(db),
+	}
+
+}
