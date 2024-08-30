@@ -3,12 +3,21 @@
 <h1 align="center">GoForge</h1>
 
 <p align="center">
-    generate entire CRUD backend for golang echo and postgres with one command
-    <br />
-    <br />
+
+ <div align="center">
+	 
+[![PyPi package version](https://img.shields.io/pypi/v/goforge)](https://pypi.org/project/goforge/)	 
+[![PyPi downloads](https://static.pepy.tech/badge/goforge)](https://pypi.org/project/goforge/)
+[![PyPI version](https://img.shields.io/pypi/pyversions/goforge?color=%2344CC11&style=flat-square)](https://pypi.org/project/goforge/)
+
+<br>
+    generate the entire CRUD backend for golang echo and postgres with one command
+ </div>
+    <br>
+    <br>
     
 ## Description
- This tool is designed to be used as a starting a project and editing the files later. It uses sqlc to generate all the sql related code. Make sure sqlc, goimports, gofmt, docker are installed
+ This tool is designed to be used for starting a project and editing the files later. It uses sqlc to generate all the sql related code. Make sure sqlc, goimports, gofmt, and docker are installed.
 
  ## Installation
  ```bash
@@ -30,6 +39,7 @@ edit the yaml as per your requirements
 ```yaml
 project_path: "example"
 schema_file: "example.sql"
+project_mod: "example.com/crud"
 handlers:
   - name: CreateUser
     path: "/v1/api/user"

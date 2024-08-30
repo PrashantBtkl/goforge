@@ -5,7 +5,7 @@ import argparse
 
 def entrypoint():
     parser = argparse.ArgumentParser(description="generate golang crud backend")
-    parser.add_argument("-c", "--config-file", help="path for goforge config file")
+    parser.add_argument("-c", "--config-file", required=True, help="path for goforge config file")
     
     args = parser.parse_args()
     config_file = args.config_file
