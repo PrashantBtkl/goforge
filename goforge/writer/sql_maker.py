@@ -1,5 +1,6 @@
 import yaml
 import os
+import logging
 import subprocess
 from jinja2 import Environment, FileSystemLoader
 
@@ -21,11 +22,11 @@ class SqlMaker:
             self.sqlc_queries_path = os.path.join(self.project_path, data['sql'][0]['queries'])
             self.schema_file_path = data['sql'][0]['schema']
         except yaml.YAMLError as e:
-            print(f"Error parsing YAML file: {e}")
+            logging.error(f"Error parsing YAML file: {e}")
         except FileNotFoundError as e:
-            print(f"File not found: {e}")
+            logging.error(f"File not found: {e}")
         except Exception as e:
-            print(f"An error occurred: {e}")
+            logging.error(f"An error occurred: {e}")
 
     def Make(self):
         self.querySqlGenerator()
@@ -45,9 +46,9 @@ class SqlMaker:
                 file.write(querysql)
     
         except FileNotFoundError as e:
-            print(f"File not found: {e}")
+            logging.error(f"File not found: {e}")
         except Exception as e:
-            print(f"An error occurred: {e}")
+            logging.error(f"An error occurred: {e}")
 
     def schemaFile(self):
         try:
@@ -57,7 +58,7 @@ class SqlMaker:
                 f = open(schema_path, 'w')
                 f.write(contents)
         except Exception as e:
-            print(f"An error occurred: {e}")
+            logging.error(f"An error occurred: {e}")
 
     def createPostgresDb(self):
         docker_compose_template = """services:
@@ -84,4 +85,4 @@ class SqlMaker:
     
         result = subprocess.run(['sqlc', 'generate'], capture_output=True, text=True)
         if result.returncode != 0:
-            print("Error:", result.stderr)
+            logging.error("Error:", result.stderr)

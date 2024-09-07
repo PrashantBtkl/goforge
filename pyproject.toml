@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "goforge"
-version = "0.0.7"
+version = "0.1.1"
 description = "generate entire CRUD backend for golang echo and postgres with one command"
 authors = ["Prashant Bhatkal <prashantbhatkal2000@gmail.com>"]
 readme = "README.md"

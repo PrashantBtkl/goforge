@@ -1,7 +1,11 @@
+import logging
+
 from goforge.config_parser import parseConfig
 from goforge.writer import sql_maker, handler_maker, server_maker
 from goforge.file_manager.file_manager import FileManager
 import argparse
+
+logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.DEBUG)
 
 def entrypoint():
     parser = argparse.ArgumentParser(description="generate customizable golang crud backend that is compatible for your postgres schema")
@@ -29,7 +33,7 @@ def entrypoint():
     # generates main.go and runs all go commands
     server_maker.ServerMaker(data['project_path'], data['project_mod'], data['handlers']).Make()
 
-    print("done")
+    logging.info("your project has been created")
 
 if __name__ == '__main__':
     entrypoint()

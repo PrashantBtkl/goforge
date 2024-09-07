@@ -1,4 +1,5 @@
 import os
+import logging
 from jinja2 import Environment, FileSystemLoader
 
 class HandlerMaker:
@@ -37,7 +38,7 @@ class HandlerMaker:
             with open(file_path, 'w') as f:
                 f.write('package handlers\n\n')
         except Exception as e:
-            print(f"An error occurred: {e}")
+            logging.error(f"An error occurred: {e}")
 
         return file_path
 
@@ -51,20 +52,23 @@ package handlers
 
 import (
 	"database/sql"
+    "log/slog"
 )
 
 type Server struct {
 	Queries *models.Queries
+    Logger *slog.Logger
 }
 
-func New(db *sql.DB) *Server {
+func New(db *sql.DB, logger *slog.Logger) *Server {
 	return &Server{
 		Queries: models.New(db),
+        Logger: logger,
 	}
 
 }""")
         except Exception as e:
-            print(f"An error occurred: {e}")
+            logging.error(f"An error occurred: {e}")
 
     def genrateHandler(self):
         handler_template = """
@@ -84,6 +88,7 @@ func (s *Server) {{name}}(c echo.Context) error {
     {% if has_params and sql_returns %}
     response, err := s.Queries.{{model_name}}(c.Request().Context(), request)
     if err != nil {
+        s.Logger.Error("failed to execute sql", "err", err.Error())
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
     }
 
@@ -92,6 +97,7 @@ func (s *Server) {{name}}(c echo.Context) error {
     {% if not has_params and sql_returns %}
     response, err := s.Queries.{{model_name}}(c.Request().Context())
     if err != nil {
+        s.Logger.Error("failed to execute sql", "err", err.Error())
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
     }
 
@@ -100,6 +106,7 @@ func (s *Server) {{name}}(c echo.Context) error {
     {% if has_params and not sql_returns %}
     err := s.Queries.{{model_name}}(c.Request().Context(), request)
     if err != nil {
+        s.Logger.Error("failed to execute sql", "err", err.Error())
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
     }
 
@@ -108,6 +115,7 @@ func (s *Server) {{name}}(c echo.Context) error {
     {% if not has_params and not sql_returns %}
     err := s.Queries.{{model_name}}(c.Request().Context())
     if err != nil {
+        s.Logger.Error("failed to execute sql", "err", err.Error())
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
     }
 
@@ -121,7 +129,7 @@ func (s *Server) {{name}}(c echo.Context) error {
             with open(self.file_path, 'a') as f:
                 f.write(rendered_template)
         except Exception as e:
-            print(f"An error occurred: {e}")
+            logging.error(f"An error occurred: {e}")
 
 def GenerateHandlers(project_path, handlers):
     for handler in handlers:

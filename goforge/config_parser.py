@@ -1,4 +1,5 @@
 import yaml
+import logging
 
 def parseConfig(file_path):
     try:
@@ -7,8 +8,8 @@ def parseConfig(file_path):
         return data
     
     except yaml.YAMLError as e:
-        print(f"Error parsing YAML file: {e}")
+        logging.error(f"Error parsing YAML file: {e}")
     except FileNotFoundError:
-        print(f"File not found: {file_path}")
+        logging.error(f"File not found: {file_path}")
     except Exception as e:
-        print(f"An error occurred: {e}")
+        loggging.error(f"An error occurred: {e}")
