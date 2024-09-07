@@ -27,10 +27,10 @@ pip install goforge
 ```bash
 $ goforge --config-file example.yml
 
-Folder 'example' deleted successfully.
-initiated golang project: example.com/my_crud_app
-Container example-postgres-1  Created
-done
+INFO: Folder 'example' deleted successfully.
+INFO: initiated golang project: example.com/crud
+INFO: setting up postgres docker
+INFO: your project has been created
 ```
 
 ## API Configuration Documentation
