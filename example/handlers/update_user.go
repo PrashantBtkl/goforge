@@ -16,6 +16,7 @@ func (s *Server) UpdateUser(c echo.Context) error {
 
 	err := s.Queries.UpdateUserName(c.Request().Context(), request)
 	if err != nil {
+		s.Logger.Error("failed to execute sql", "err", err.Error())
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 

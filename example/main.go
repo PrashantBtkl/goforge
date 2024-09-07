@@ -2,7 +2,8 @@ package main
 
 import (
 	"database/sql"
-	"log"
+	"log/slog"
+	"os"
 
 	"example.com/crud/handlers"
 	"github.com/labstack/echo/v4"
@@ -11,15 +12,17 @@ import (
 
 func main() {
 	e := echo.New()
+	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
 	// TODO: should be configurable from config yaml
 	connStr := "host=localhost port=5432 user=postgres dbname=postgres password=postgres sslmode=disable"
 	var err error
 	Db, err := sql.Open("postgres", connStr)
 	if err != nil {
-		log.Fatal(err)
+		logger.Error("failed to connect to postgres database", "err", err.Error())
+		panic(err)
 	}
 	defer Db.Close()
-	s := handlers.New(Db)
+	s := handlers.New(Db, logger)
 
 	e.PATCH("/v1/api/user", s.UpdateUser)
 
