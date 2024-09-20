@@ -26,3 +26,4 @@ handlers:
       query: "select id, name, email from users"
     request:
       method: "GET"
+      paginate: true
