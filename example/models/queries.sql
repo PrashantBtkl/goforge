@@ -5,5 +5,5 @@ update users set name = $1 where id = $2;
 insert into users (name, email) values ($1, $2);
 
 -- name: GetUsers :many
-select id, name, email from users;
+select id, name, email from users LIMIT $1 OFFSET $2;
 
