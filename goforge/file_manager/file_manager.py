@@ -1,5 +1,7 @@
 import os
 import shutil
+import logging
+
 class FileManager:
     def __init__(self, project_path):
         self.project_path = project_path
@@ -8,9 +10,9 @@ class FileManager:
     def deleteProject(self):
         try:
             shutil.rmtree(self.project_path)
-            print(f"Folder '{self.project_path}' deleted successfully.")
+            logging.info(f"Folder '{self.project_path}' deleted successfully.")
         except Exception as e:
-            print(f"Error deleting folder: {e}")
+            logging.error(f"Error deleting folder: {e}")
     
     def createGolangProjectTemplate(self):
         os.mkdir(self.project_path)

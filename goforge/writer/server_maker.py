@@ -1,4 +1,5 @@
 import os
+import logging
 import subprocess
 from jinja2 import Environment, FileSystemLoader
 
@@ -25,6 +26,7 @@ class ServerMaker:
 package main
 
 import (
+    "log/slog"
     "database/sql"
 	"github.com/labstack/echo/v4"
     _ "github.com/lib/pq"
@@ -33,18 +35,20 @@ import (
 
 func main() {
 	e := echo.New()
-    // TODO: refactor db initilization
-    connStr := "host=localhost port=5432 user=postgres dbname=postgres password=postgres sslmode=disable"
-    var err error
-    handlers.Db, err = sql.Open("postgres", connStr)
+    logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
+	// TODO: should be configurable from config yaml
+	connStr := "host=localhost port=5432 user=postgres dbname=postgres password=postgres sslmode=disable"
+	var err error
+	Db, err := sql.Open("postgres", connStr)
 	if err != nil {
-		log.Fatal(err)
+        logger.Error("failed to connect to postgres database", "err", err.Error())
+        panic(err)
 	}
-	defer handlers.Db.Close()
-	handlers.Client = models.New(handlers.Db)
+	defer Db.Close()
+	s := handlers.New(Db, logger)
 
     {% for route in routes %}
-    e.{{route.method}}("{{route.path}}", handlers.{{route.handler}})
+    e.{{route.method}}("{{route.path}}", s.{{route.handler}})
     {% endfor %}
     
 	e.Logger.Fatal(e.Start(":8080"))
@@ -60,30 +64,25 @@ func main() {
             with open("main.go", 'w') as f:
                 f.write(rendered_template)
         except Exception as e:
-            print(f"An error occurred while writing to main: {e}")
+            logging.error(f"An error occurred while writing to main: {e}")
 
     # assumes current directory is in project
     def initializeProject(self):
         result = subprocess.run(['go', 'mod', 'init', self.project_mod], capture_output=True, text=True)
-        print("initiated golang project:", self.project_mod)
+        logging.info("initiated golang project: %s", self.project_mod)
         if result.returncode != 0:
-            print("Error:", result.stderr)
+            logging.error("Error: %s", result.stderr)
         result = subprocess.run(['go', 'mod', 'tidy'], capture_output=True, text=True)
         if result.returncode != 0:
-            print("Error:", result.stderr)
-        result = subprocess.run(['gofmt', '.'], capture_output=True, text=True)
+            logging.error("Error: %s", result.stderr)
+        result = subprocess.run(['goimports', '-w', '-v', '.'], capture_output=True, text=True)
         if result.returncode != 0:
-            print("Error:", result.stderr)
+            logging.error("Error: %s", result.stderr)
         result = subprocess.run(['goimports', '-w', '.'], capture_output=True, text=True)
         if result.returncode != 0:
-            print("Error:", result.stderr)
+            logging.error("Error: %s", result.stderr)
         if self.setup_postgres_local:
             result = subprocess.run(['docker', 'compose', 'up', '-d'], capture_output=True, text=True)
-            print(result.stdout, result.stderr)
+            logging.info("initiated postgres: %s", result.stderr)
             if result.returncode != 0:
-                print("Error:", result.stderr)
-
-
-
-
-
+                logging.error("Error: %s", result.stderr)

@@ -1,4 +1,5 @@
 import os
+import logging
 from jinja2 import Environment, FileSystemLoader
 
 class HandlerMaker:
@@ -37,7 +38,7 @@ class HandlerMaker:
             with open(file_path, 'w') as f:
                 f.write('package handlers\n\n')
         except Exception as e:
-            print(f"An error occurred: {e}")
+            logging.error(f"An error occurred: {e}")
 
         return file_path
 
@@ -51,71 +52,92 @@ package handlers
 
 import (
 	"database/sql"
+    "log/slog"
 )
 
-var Db *sql.DB
-var Client *models.Queries""")
-        except Exception as e:
-            print(f"An error occurred: {e}")
+type Server struct {
+	Queries *models.Queries
+    Logger *slog.Logger
+}
 
-    def genrateHandler(self):
+func New(db *sql.DB, logger *slog.Logger) *Server {
+	return &Server{
+		Queries: models.New(db),
+        Logger: logger,
+	}
+
+}""")
+        except Exception as e:
+            logging.error(f"An error occurred: {e}")
+
+    def generate_handler(self):
         handler_template = """
 import (
     "net/http"
-	"github.com/labstack/echo/v4"
+    "github.com/labstack/echo/v4"
 )
 
-func {{name}}(c echo.Context) error {
-    {% if has_params %}
-	var request models.{{request_params}}
-	if err := c.Bind(&request); err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
-	}
-    {% endif %}
-
-    {% if has_params and sql_returns %}
-    response, err := Client.{{model_name}}(c.Request().Context(), request)
-    if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
-    }
-
-	return c.JSON(http.StatusOK, response)
-    {% endif %}
-    {% if not has_params and sql_returns %}
-    response, err := Client.{{model_name}}(c.Request().Context())
-    if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
-    }
-
-	return c.JSON(http.StatusOK, response)
-    {% endif %}
-    {% if has_params and not sql_returns %}
-    err := Client.{{model_name}}(c.Request().Context(), request)
-    if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
-    }
-
-	return c.JSON(http.StatusOK, nil)
-    {% endif %}
-    {% if not has_params and not sql_returns %}
-    err := Client.{{model_name}}(c.Request().Context())
-    if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
-    }
-
-	return c.JSON(http.StatusOK, nil)
-    {% endif %}
+func (s *Server) {{name}}(c echo.Context) error {
+    {{request_binding}}
+    {{query_execution}}
+    {{response}}
 }"""
+
+        template_parts = {
+            'request_binding': self._get_request_binding(),
+            'query_execution': self._get_query_execution(),
+            'response': self._get_response(),
+        }
+
         env = Environment(loader=FileSystemLoader(""))
         template = env.from_string(handler_template)
-        rendered_template = template.render(name=self.name,  request_params=self.request_params, model_name=self.model_name, has_params=self.has_params, sql_returns=self.sql_returns)
+        rendered_template = template.render(
+            name=self.name,
+            **template_parts
+        )
+
         try:
             with open(self.file_path, 'a') as f:
                 f.write(rendered_template)
         except Exception as e:
-            print(f"An error occurred: {e}")
+            logging.error(f"An error occurred: {e}")
 
-def generateHandlers(project_path, handlers):
+    def _get_request_binding(self):
+        if not self.has_params:
+            return ""
+        return f"""
+    var request models.{self.request_params}
+    if err := c.Bind(&request); err != nil {{
+        return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+    }}"""
+
+    def _get_query_execution(self):
+        context = "c.Request().Context()"
+        query_call = f"s.Queries.{self.model_name}"
+        
+        if self.has_params:
+            args = f"{context}, request"
+        else:
+            args = context
+
+        if self.sql_returns:
+            return f"\n    response, err := {query_call}({args})"
+        else:
+            return f"\n    err := {query_call}({args})"
+
+    def _get_response(self):
+        error_handling = """
+    if err != nil {
+        s.Logger.Error("failed to execute sql", "err", err.Error())
+        return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+    }"""
+        
+        if self.sql_returns:
+            return f"{error_handling}\n    return c.JSON(http.StatusOK, response)"
+        else:
+            return f"{error_handling}\n    return c.JSON(http.StatusOK, nil)"
+
+def GenerateHandlers(project_path, handlers):
     for handler in handlers:
-        HandlerMaker(project_path, handler).genrateHandler()
+        HandlerMaker(project_path, handler).generate_handler()
 
