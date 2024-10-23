@@ -2,9 +2,20 @@ package handlers
 
 import (
 	"database/sql"
+	"log/slog"
 
 	"example.com/crud/models"
 )
 
-var Db *sql.DB
-var Client *models.Queries
+type Server struct {
+	Queries *models.Queries
+	Logger  *slog.Logger
+}
+
+func New(db *sql.DB, logger *slog.Logger) *Server {
+	return &Server{
+		Queries: models.New(db),
+		Logger:  logger,
+	}
+
+}
