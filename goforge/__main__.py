@@ -4,15 +4,20 @@ from goforge.file_manager.file_manager import FileManager
 import argparse
 
 def entrypoint():
-    parser = argparse.ArgumentParser(description="generate golang crud backend")
+    parser = argparse.ArgumentParser(description="generate Golang-Postgres CRUD backend blazingly fast 💙")
     parser.add_argument("-c", "--config-file", required=True, help="path for goforge config file")
+    parser.add_argument("-d", "--delete", action="store_true", help="delete the project")
     
     args = parser.parse_args()
     config_file = args.config_file
     
     data = parseConfig(config_file)
-    
     file_manager = FileManager(data['project_path'])
+
+    if args.delete:
+        file_manager.deleteProject()
+        return
+    
     file_manager.deleteProject()
     file_manager.createGolangProjectTemplate()
     
@@ -24,7 +29,7 @@ def entrypoint():
     handler_maker.generateHandlers(data['project_path'], data['handlers'])
     
     # generates main.go and runs all go commands
-    server_maker.ServerMaker(data['project_path'], data['project_mod'], data['handlers']).Make()
+    server_maker.ServerMaker(data['project_path'], data['project_mod'], data['setup_postgres_local'], data['handlers']).Make()
 
     print("done")
 

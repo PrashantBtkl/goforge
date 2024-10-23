@@ -24,11 +24,16 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) error {
 }
 
 const getUsers = `-- name: GetUsers :many
-select id, name, email from users
+select id, name, email from users LIMIT $1 OFFSET $2
 `
 
-func (q *Queries) GetUsers(ctx context.Context) ([]User, error) {
-	rows, err := q.query(ctx, q.getUsersStmt, getUsers)
+type GetUsersParams struct {
+	Limit  int32 `json:"limit"`
+	Offset int32 `json:"offset"`
+}
+
+func (q *Queries) GetUsers(ctx context.Context, arg GetUsersParams) ([]User, error) {
+	rows, err := q.query(ctx, q.getUsersStmt, getUsers, arg.Limit, arg.Offset)
 	if err != nil {
 		return nil, err
 	}

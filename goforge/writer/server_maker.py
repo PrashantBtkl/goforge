@@ -3,9 +3,10 @@ import subprocess
 from jinja2 import Environment, FileSystemLoader
 
 class ServerMaker:
-    def __init__(self, project_path, project_mod, handlers):
+    def __init__(self, project_path, project_mod, setup_postgres_local, handlers):
         self.project_path = project_path
         self.project_mod = project_mod
+        self.setup_postgres_local = setup_postgres_local
         self.handlers = handlers
         self.routes = []
         self._generate_routes()
@@ -63,7 +64,6 @@ func main() {
 
     # assumes current directory is in project
     def initializeProject(self):
-        # TODO: make project name customizable
         result = subprocess.run(['go', 'mod', 'init', self.project_mod], capture_output=True, text=True)
         print("initiated golang project:", self.project_mod)
         if result.returncode != 0:
@@ -77,10 +77,11 @@ func main() {
         result = subprocess.run(['goimports', '-w', '.'], capture_output=True, text=True)
         if result.returncode != 0:
             print("Error:", result.stderr)
-        result = subprocess.run(['docker', 'compose', 'up', '-d'], capture_output=True, text=True)
-        print(result.stdout, result.stderr)
-        if result.returncode != 0:
-            print("Error:", result.stderr)
+        if self.setup_postgres_local:
+            result = subprocess.run(['docker', 'compose', 'up', '-d'], capture_output=True, text=True)
+            print(result.stdout, result.stderr)
+            if result.returncode != 0:
+                print("Error:", result.stderr)
 
 
 
