@@ -11,11 +11,11 @@
 [![PyPI version](https://img.shields.io/pypi/pyversions/goforge?color=%2344CC11&style=flat-square)](https://pypi.org/project/goforge/)
 <br>
 <br>
-generate entire CRUD backend for golang echo and postgres with one command 💙
+generate the entire CRUD backend for golang echo and postgres with one command 💙
 </div>
     
 ## Description
- This tool is designed to be used for starting a project and editing the files later. It uses sqlc to generate all the sql related code. Make sure sqlc, goimports, gofmt, and docker are installed.
+ This tool is designed to start a project and edit the files later. It uses sqlc to generate all the sql related code. Make sure sqlc, goimports, gofmt, and docker are installed.
 
  ## Prerequisites
  ```bash
@@ -59,6 +59,6 @@ handlers:
     sql:
       name: GetUsers
       annotation: many
-      query: "SELECT id, name, email FROM users LIMIT $1 AND OFFSET $2"
+      query: "SELECT id, name, email FROM users LIMIT $1 OFFSET $2"
     request:
       method: "GET"
