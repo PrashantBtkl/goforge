@@ -44,7 +44,14 @@ edit the yaml as per your requirements
 project_path: "example" # specifies the root directory for the project
 schema_file: "example.sql" # defines the sql schema file for the project
 project_mod: "example.com/my_crud_app" # go.mod project name
-setup_postgres_local: true # setups a postgres docker instance for seamless testing
+db:
+  setup_postgres_local: true # setups a postgres docker instance for seamless testing, set false if you want to connect with your db instance
+  # host, port, dbname, user and password are accessed only if setup_postgres_local = false, you can skip these values if setup_postgres_local = true
+  host: localhost
+  port: 5432
+  dbname: postgres
+  user: postgres
+  password: postgres123
 handlers:
   - name: CreateUser # handler function name
     path: "/v1/api/user" # api path

@@ -5,11 +5,15 @@ import logging
 class FileManager:
     def __init__(self, project_path):
         self.project_path = project_path
+        self.full_path = os.path.abspath(project_path)
 
-    #TODO: By default project shouldnt be deleted
-    def deleteProject(self):
+    def deleteProject(self, exception=False):
+        if exception:
+            logging.info(f"deleting your project since an exception occurred while creation: {self.full_path}")
+        else:
+            logging.info(f"deleting your project: {self.full_path}")
         try:
-            shutil.rmtree(self.project_path)
+            shutil.rmtree(self.full_path)
             logging.info(f"Folder '{self.project_path}' deleted successfully.")
         except Exception as e:
             logging.error(f"Error deleting folder: {e}")
