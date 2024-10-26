@@ -30,10 +30,22 @@ def entrypoint():
     sql_maker.SqlMaker(data['project_path'], data).Make()
     
     # creates handler files for each handler
-    handler_maker.GenerateHandlers(data['project_path'], data['handlers'])
+    try:
+        handler_maker.GenerateHandlers(data['project_path'], data['handlers'])
+    except Exception as e:
+        logging.error(f"failed to generate handlers: {e}")
+        file_manager.deleteProject(exception=True)
+        return
+
     
     # generates main.go and runs all go commands
-    server_maker.ServerMaker(data['project_path'], data['project_mod'], data['setup_postgres_local'], data['handlers']).Make()
+    try:
+        server_maker.ServerMaker(data['project_path'], data['project_mod'], data['db'], data['handlers']).Make()
+    except Exception as e:
+        logging.error(f"failed to generate server: {e}")
+        file_manager.deleteProject(exception=True)
+        return
+
 
     logging.info("your project has been created")
 

@@ -13,7 +13,7 @@ import (
 func main() {
 	e := echo.New()
 	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
-	// TODO: should be configurable from config yaml
+	// TODO: take from env
 	connStr := "host=localhost port=5432 user=postgres dbname=postgres password=postgres sslmode=disable"
 	var err error
 	Db, err := sql.Open("postgres", connStr)
@@ -25,9 +25,7 @@ func main() {
 	s := handlers.New(Db, logger)
 
 	e.PATCH("/v1/api/user", s.UpdateUser)
-
 	e.POST("/v1/api/user", s.CreateUser)
-
 	e.GET("/v1/api/users", s.GetUsers)
 
 	e.Logger.Fatal(e.Start(":8080"))

@@ -1,7 +1,7 @@
 import yaml
 import logging
 
-def parseConfig(file_path):
+def parseConfig(file_path: str) -> dict:
     try:
         with open(file_path, 'r') as file:
             data = yaml.safe_load(file)
@@ -9,7 +9,10 @@ def parseConfig(file_path):
     
     except yaml.YAMLError as e:
         logging.error(f"Error parsing YAML file: {e}")
+        return {}
     except FileNotFoundError:
         logging.error(f"File not found: {file_path}")
+        return {}
     except Exception as e:
-        loggging.error(f"An error occurred: {e}")
+        logging.error(f"An error occurred: {e}")
+        return {}

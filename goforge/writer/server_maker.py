@@ -1,13 +1,13 @@
-import os
 import logging
 import subprocess
 from jinja2 import Environment, FileSystemLoader
 
 class ServerMaker:
-    def __init__(self, project_path, project_mod, setup_postgres_local, handlers):
+    def __init__(self, project_path, project_mod, db, handlers):
         self.project_path = project_path
         self.project_mod = project_mod
-        self.setup_postgres_local = setup_postgres_local
+        self.setup_postgres_local = db['setup_postgres_local']
+        self.db = self._db_config(db)
         self.handlers = handlers
         self.routes = []
         self._generate_routes()
@@ -16,6 +16,16 @@ class ServerMaker:
         for handler in self.handlers:
             route = dict(path=handler['path'], method= handler['request']['method'], handler= handler['name'])
             self.routes.append(route)
+
+    def _db_config(self, db) -> dict:
+        if self.setup_postgres_local:
+            return dict(host='localhost', port=5432, user='postgres', dbname='postgres', password='postgres')
+
+        for config in ['host', 'port', 'user', 'dbname', 'password']:
+            if config not in db:
+                raise Exception(f"database config is missing '{config}'")
+        return dict(host=db['host'], port=db['port'], user=db['user'], dbname=db['dbname'], password=db['password'])
+
 
     def Make(self):
         self.createMainServer()
@@ -36,8 +46,8 @@ import (
 func main() {
 	e := echo.New()
     logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
-	// TODO: should be configurable from config yaml
-	connStr := "host=localhost port=5432 user=postgres dbname=postgres password=postgres sslmode=disable"
+	// TODO: take from env
+	connStr := "host={{db.host}} port={{db.port}} user={{db.user}} dbname={{db.dbname}} password={{db.password}} sslmode=disable"
 	var err error
 	Db, err := sql.Open("postgres", connStr)
 	if err != nil {
@@ -48,15 +58,14 @@ func main() {
 	s := handlers.New(Db, logger)
 
     {% for route in routes %}
-    e.{{route.method}}("{{route.path}}", s.{{route.handler}})
-    {% endfor %}
+    e.{{route.method}}("{{route.path}}", s.{{route.handler}}){% endfor %}
     
 	e.Logger.Fatal(e.Start(":8080"))
     }
 """
         env = Environment(loader=FileSystemLoader(""))
         template = env.from_string(template_str)
-        rendered_template = template.render(routes=self.routes)
+        rendered_template = template.render(db=self.db, routes=self.routes)
         #main_file = os.path.join('handlers', f"{file_name}.go")
         try:
             # we already change our working directory while we generate sqlc.yml file

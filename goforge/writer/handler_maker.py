@@ -42,7 +42,6 @@ class HandlerMaker:
 
         return file_path
 
-    # TODO: refactor db initialization
     def _createConfig(self):
         file_path = os.path.join('handlers', "config.go")
         try:
@@ -102,7 +101,7 @@ func (s *Server) {{name}}(c echo.Context) error {
         except Exception as e:
             logging.error(f"An error occurred: {e}")
 
-    def _get_request_binding(self):
+    def _get_request_binding(self) -> str:
         if not self.has_params:
             return ""
         return f"""
@@ -111,7 +110,7 @@ func (s *Server) {{name}}(c echo.Context) error {
         return echo.NewHTTPError(http.StatusBadRequest, err.Error())
     }}"""
 
-    def _get_query_execution(self):
+    def _get_query_execution(self) -> str:
         context = "c.Request().Context()"
         query_call = f"s.Queries.{self.model_name}"
         
@@ -138,6 +137,10 @@ func (s *Server) {{name}}(c echo.Context) error {
             return f"{error_handling}\n    return c.JSON(http.StatusOK, nil)"
 
 def GenerateHandlers(project_path, handlers):
+    duplicates =  set()
     for handler in handlers:
+        if (handler['request']['method'], handler['path']) in duplicates:
+            raise Exception(f"duplicate api found with same path and method {handler['request']['method'], handler['path']}")
         HandlerMaker(project_path, handler).generate_handler()
+        duplicates.add((handler['request']['method'], handler['path']))
 
