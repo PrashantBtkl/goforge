@@ -1,3 +1,3 @@
-from .config_parser import parseConfig
+from .config_parser import parse_config
 
-__all__ = ["parseConfig"]
+__all__ = ["parse_config"]

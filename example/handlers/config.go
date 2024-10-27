@@ -17,5 +17,4 @@ func New(db *sql.DB, logger *slog.Logger) *Server {
 		Queries: models.New(db),
 		Logger:  logger,
 	}
-
 }
